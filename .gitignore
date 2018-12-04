@@ -12,3 +12,4 @@ dead_man_switch
 .vscode/
 .grifter/
 .env
+public/uploads
