@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/gobuffalo/buffalo/binding"
@@ -15,7 +17,6 @@ import (
 	"github.com/gobuffalo/pop"
 	"github.com/gobuffalo/uuid"
 	"github.com/gobuffalo/validate"
-	"github.com/gobuffalo/validate/validators"
 )
 
 type Upload struct {
@@ -45,15 +46,15 @@ func (u Uploads) String() string {
 // Validate gets run every time you call a "pop.Validate*" (pop.ValidateAndSave, pop.ValidateAndCreate, pop.ValidateAndUpdate) method.
 // This method is not required and may be deleted.
 func (u *Upload) Validate(tx *pop.Connection) (*validate.Errors, error) {
-	return validate.Validate(
-		&validators.StringIsPresent{Field: u.FilePath, Name: "FilePath"},
-		&validators.StringIsPresent{Field: u.Key, Name: "Key"},
-	), nil
+	return validate.Validate(), nil
 }
 
 // ValidateCreate gets run every time you call "pop.ValidateAndCreate" method.
 // This method is not required and may be deleted.
 func (u *Upload) ValidateCreate(tx *pop.Connection) (*validate.Errors, error) {
+	t := time.Now().Unix()
+	s := strconv.FormatInt(t, 10)
+	u.Key = generateHash(s)
 	return validate.NewErrors(), nil
 }
 
@@ -78,13 +79,22 @@ func (u *Upload) AfterCreate(tx *pop.Connection) error {
 	}
 	defer f.Close()
 	_, err = io.Copy(f, u.File)
+
+	// Update FilePath
+	u.FilePath = f.Name()
+	verrs, err := tx.ValidateAndUpdate(u)
+	if verrs != nil {
+		log.Println(verrs)
+	}
+	log.Println(err)
+
 	return err
 }
 
-func generateHash(v []byte) string {
+func generateHash(s string) string {
 	// A hash needs to be 64 bytes long to have 256-bit collision resistance.
 	h := make([]byte, 64)
 	// Compute a 64-byte hash of buf and put it in h.
-	sha3.ShakeSum256(h, v)
+	sha3.ShakeSum256(h, []byte(s))
 	return fmt.Sprintf("%x", h)
 }
