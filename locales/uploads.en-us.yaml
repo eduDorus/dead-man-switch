@@ -1,0 +1,6 @@
+- id: "upload.created.success"
+  translation: "Upload was successfully created."
+- id: "upload.updated.success"
+  translation: "Upload was successfully updated."
+- id: "upload.destroyed.success"
+  translation: "Upload was successfully destroyed."

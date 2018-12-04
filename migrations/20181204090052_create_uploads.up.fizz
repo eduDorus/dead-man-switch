@@ -1,0 +1,5 @@
+create_table("uploads") {
+	t.Column("id", "uuid", {"primary": true})
+	t.Column("file_path", "string", {})
+	t.Column("key", "string", {})
+}

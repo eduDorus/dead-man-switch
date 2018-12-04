@@ -1,0 +1,8 @@
+<div class="page-header">
+  <h1>Edit Upload</h1>
+</div>
+
+<%= form_for(upload, {action: uploadPath({ upload_id: upload.ID }), method: "PUT"}) { %>
+  <%= partial("uploads/form.html") %>
+  <a href="<%= uploadPath({ upload_id: upload.ID }) %>" class="btn btn-warning" data-confirm="Are you sure?">Cancel</a>
+<% } %>

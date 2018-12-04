@@ -1,0 +1,14 @@
+vendor/
+**/*.log
+**/*.sqlite
+.idea/
+bin/
+tmp/
+node_modules/
+.sass-cache/
+*-packr.go
+public/assets/
+dead_man_switch
+.vscode/
+.grifter/
+.env

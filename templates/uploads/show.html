@@ -1,0 +1,16 @@
+<div class="page-header">
+  <h1>Upload#Show</h1>
+</div>
+
+<ul class="list-unstyled list-inline">
+  <li class="list-inline-item"><a href="<%= uploadsPath() %>" class="btn btn-info">Back to all Uploads</a></li>
+  <li class="list-inline-item"><a href="<%= editUploadPath({ upload_id: upload.ID })%>" class="btn btn-warning">Edit</a></li>
+  <li class="list-inline-item"><a href="<%= uploadPath({ upload_id: upload.ID })%>" data-method="DELETE" data-confirm="Are you sure?" class="btn btn-danger">Destroy</a>
+</ul>
+
+<p>
+  <strong>FilePath</strong>: <%= upload.FilePath %>
+</p>
+<p>
+  <strong>Key</strong>: <%= upload.Key %>
+</p>
