@@ -1,18 +1,21 @@
 package models
 
 import (
+	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/md5"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
-	"os"
-	"path/filepath"
-	"strconv"
 	"time"
+
+	"github.com/ipfs/go-ipfs-api"
 
 	"github.com/gobuffalo/buffalo/binding"
 	"github.com/pkg/errors"
-	"golang.org/x/crypto/sha3"
 
 	"github.com/gobuffalo/pop"
 	"github.com/gobuffalo/uuid"
@@ -52,9 +55,6 @@ func (u *Upload) Validate(tx *pop.Connection) (*validate.Errors, error) {
 // ValidateCreate gets run every time you call "pop.ValidateAndCreate" method.
 // This method is not required and may be deleted.
 func (u *Upload) ValidateCreate(tx *pop.Connection) (*validate.Errors, error) {
-	t := time.Now().Unix()
-	s := strconv.FormatInt(t, 10)
-	u.Key = generateHash(s)
 	return validate.NewErrors(), nil
 }
 
@@ -69,19 +69,20 @@ func (u *Upload) AfterCreate(tx *pop.Connection) error {
 	if !u.File.Valid() {
 		return nil
 	}
-	dir := filepath.Join(".", "public", "uploads")
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return errors.WithStack(err)
-	}
-	f, err := os.Create(filepath.Join(dir, u.File.Filename))
+
+	var buf bytes.Buffer
+	io.Copy(&buf, u.File)
+
+	ed := encrypt(buf.Bytes(), u.Key)
+	// upload and pin to IPFS
+	sh := shell.NewShell("localhost:5001")
+	cid, err := sh.Add(bytes.NewReader(ed))
 	if err != nil {
-		return errors.WithStack(err)
+		log.Println(errors.WithStack(err))
 	}
-	defer f.Close()
-	_, err = io.Copy(f, u.File)
 
 	// Update FilePath
-	u.FilePath = f.Name()
+	u.FilePath = cid
 	verrs, err := tx.ValidateAndUpdate(u)
 	if verrs != nil {
 		log.Println(verrs)
@@ -91,10 +92,41 @@ func (u *Upload) AfterCreate(tx *pop.Connection) error {
 	return err
 }
 
-func generateHash(s string) string {
-	// A hash needs to be 64 bytes long to have 256-bit collision resistance.
-	h := make([]byte, 64)
-	// Compute a 64-byte hash of buf and put it in h.
-	sha3.ShakeSum256(h, []byte(s))
-	return fmt.Sprintf("%x", h)
+func createHash(key string) string {
+	hasher := md5.New()
+	hasher.Write([]byte(key))
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func encrypt(data []byte, passphrase string) []byte {
+	block, _ := aes.NewCipher([]byte(createHash(passphrase)))
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		panic(err.Error())
+	}
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+		panic(err.Error())
+	}
+	ciphertext := gcm.Seal(nonce, nonce, data, nil)
+	return ciphertext
+}
+
+func decrypt(data []byte, passphrase string) []byte {
+	key := []byte(createHash(passphrase))
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err.Error())
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		panic(err.Error())
+	}
+	nonceSize := gcm.NonceSize()
+	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
+	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		panic(err.Error())
+	}
+	return plaintext
 }
