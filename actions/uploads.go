@@ -128,7 +128,7 @@ func (v UploadsResource) Create(c buffalo.Context) error {
 	c.Flash().Add("success", "Upload was created successfully")
 
 	// and redirect to the uploads index page
-	return c.Render(201, r.Auto(c, upload))
+	return c.Redirect(301, "/blocks")
 }
 
 // Edit renders a edit form for a Upload. This function is

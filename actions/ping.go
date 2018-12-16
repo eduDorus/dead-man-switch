@@ -17,5 +17,5 @@ func PingUpdateHandler(c buffalo.Context) error {
 	pk, _ := crypto.ToECDSA(bkp)
 
 	PingFile(fileID, pk)
-	return nil
+	return c.Redirect(301, "/blocks")
 }

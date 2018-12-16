@@ -6,6 +6,7 @@
     <th>IPFSHash</th>
     <th>Key</th>
     <th>Ping</th>
+    <th>File</th>
   </thead>
   <tbody>
     <%= for (file) in files { %>
@@ -14,6 +15,13 @@
       <td><%= file.IpfsHash %></td>
       <td><%= file.Key %></td>
       <td><%= file.Ping %></td>
+      <td>
+        <%= if (file.Key != "") { %>
+        <div class="pull-right">
+          <a href="<%= decryptPath({ ipfs_hash: file.IpfsHash, secret: file.Key }) %>" target="blank" class="btn btn-info">View</a>
+        </div>
+        <% } %>
+      </td>
     </tr>
     <% } %>
   </tbody>
