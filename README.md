@@ -4,6 +4,7 @@ The following steps describe the process of hosting the dead man switch applicat
 
 Prerequisites:
 - Golang installed (Version 1.11+)
+- [goBuffalo](https://gobuffalo.io/en/docs/installation) installed (Version 13.07+) 
 - Postgres Database running (Docker or native is up to you)
 
 ## IPFS Node Setup
