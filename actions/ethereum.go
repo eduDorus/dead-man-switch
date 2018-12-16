@@ -3,7 +3,6 @@ package actions
 import (
 	"crypto/ecdsa"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
@@ -12,8 +11,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-
-	"github.com/pkg/errors"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
@@ -51,9 +48,8 @@ func init() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Mining...")
 	sim.Commit()
-	fmt.Println("Gas used: ", transaction.Gas())
+	fmt.Println("Gas used to create contract on blockchain:", transaction.Cost())
 
 	fmt.Println("PrivateKey:", hex.EncodeToString(userKey.D.Bytes()))
 	fmt.Println("PublicKey:", crypto.PubkeyToAddress(userKey.PublicKey).Hex())
@@ -64,37 +60,23 @@ func init() {
 }
 
 func UploadFileToBlockchain(ipfsHash, address string) error {
-	fmt.Println("Generating Address from Hex ", address)
+	fmt.Println("Generating Address from Hex:", address)
 	toAddress := common.HexToAddress(address)
-	fmt.Println(toAddress)
-	fmt.Println(contract)
-
-	fmt.Println("Add ipfs hash", ipfsHash, "to blackchain...")
-	_, err := contract.AddFile(&bind.TransactOpts{
+	fmt.Println("Add ipfs hash to blackchain:", ipfsHash)
+	transaction, err := contract.AddFile(&bind.TransactOpts{
 		From:     auth.From,
 		Signer:   auth.Signer,
 		GasLimit: 23816230000000,
 	}, ipfsHash, toAddress)
 	if err != nil {
-		log.Println(err)
-		return errors.WithStack(err)
+		return err
 	}
-	fmt.Println("Mining...")
 	sim.Commit()
-
-	file, err := contract.Files(&bind.CallOpts{
-		From: auth.From,
-	}, big.NewInt(0))
-	if err != nil {
-		log.Fatal(err)
-	}
-	jsonObject, _ := json.Marshal(file)
-	fmt.Println(string(jsonObject))
+	fmt.Println("Gas used to save ipfs hash in blockchain: ", transaction.Gas())
 	return nil
 }
 
 func ReadFilesFromBlockchain() []file {
-
 	var files []file
 	fileIndex := 0
 
@@ -129,27 +111,28 @@ func createTransactor() (*bind.TransactOpts, *ecdsa.PrivateKey) {
 	return bind.NewKeyedTransactor(key), key
 }
 
-func PingFile(fileId int, pk *ecdsa.PrivateKey) error {
+func PingFile(fileID int, pk *ecdsa.PrivateKey) error {
 
 	pingAuth := bind.NewKeyedTransactor(pk)
 
-	_, err := contract.Ping(&bind.TransactOpts{
+	transaction, err := contract.Ping(&bind.TransactOpts{
 		From:     pingAuth.From,
 		Signer:   pingAuth.Signer,
 		GasLimit: 23816230000000,
-	}, strconv.FormatInt(time.Now().Unix(), 10), big.NewInt(int64(fileId)))
+	}, strconv.FormatInt(time.Now().Unix(), 10), big.NewInt(int64(fileID)))
 
 	sim.Commit()
-
+	fmt.Println("Gas used for ping to blockchain: ", transaction.Cost())
 	return err
 }
 
-func writeKeyToBlockchain(fileId int, key string) {
-	contract.PubishKey(&bind.TransactOpts{
+func writeKeyToBlockchain(fileID int, key string) error {
+	transaction, err := contract.PubishKey(&bind.TransactOpts{
 		From:   auth.From,
 		Signer: auth.Signer,
-	}, key, big.NewInt(int64(fileId)))
+	}, key, big.NewInt(int64(fileID)))
 
-	fmt.Println("Mining...")
 	sim.Commit()
+	fmt.Println("Gas used to write key to blockchain: ", transaction.Cost())
+	return err
 }
