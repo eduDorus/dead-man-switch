@@ -143,3 +143,13 @@ func PingFile(fileId int, pk *ecdsa.PrivateKey) error {
 
 	return err
 }
+
+func writeKeyToBlockchain(fileId int, key string) {
+	contract.PubishKey(&bind.TransactOpts{
+		From:   auth.From,
+		Signer: auth.Signer,
+	}, key, big.NewInt(int64(fileId)))
+
+	fmt.Println("Mining...")
+	sim.Commit()
+}
