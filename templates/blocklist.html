@@ -1,0 +1,20 @@
+<div class="page-header"><h1>Blockchain List</h1></div>
+
+<table class="table table-striped">
+  <thead>
+    <th>FileOwner</th>
+    <th>IPFSHash</th>
+    <th>Key</th>
+    <th>Ping</th>
+  </thead>
+  <tbody>
+    <%= for (file) in files { %>
+    <tr>
+      <td><%= file.FileOwner.Hex() %></td>
+      <td><%= file.IpfsHash %></td>
+      <td><%= file.Key %></td>
+      <td><%= file.Ping %></td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

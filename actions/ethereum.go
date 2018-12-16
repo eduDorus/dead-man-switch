@@ -22,6 +22,13 @@ var auth *bind.TransactOpts
 var userAuth *bind.TransactOpts
 var sim *backends.SimulatedBackend
 
+type file struct {
+	FileOwner common.Address
+	IpfsHash  string
+	Key       string
+	Ping      string
+}
+
 func init() {
 
 	auth = createTransactor()
@@ -74,15 +81,35 @@ func UploadFileToBlockchain(ipfsHash, address string) error {
 	return nil
 }
 
-func ReadFilesFromBlockchain() {
+func ReadFilesFromBlockchain() []file {
+
+	var files []file
+	fileIndex := 0
+
+	for {
+		file := readFileFromBlockchain(big.NewInt(int64(fileIndex)))
+		fileIndex++
+		if file.IpfsHash == "" {
+			break
+		} else {
+			files = append(files, file)
+		}
+	}
+
+	return files
+}
+
+func readFileFromBlockchain(id *big.Int) file {
 	file, err := contract.Files(&bind.CallOpts{
 		From: auth.From,
-	}, big.NewInt(0))
+	}, id)
 	if err != nil {
 		log.Fatal(err)
 	}
 	jsonObject, _ := json.Marshal(file)
 	fmt.Println(string(jsonObject))
+
+	return file
 }
 
 func createTransactor() *bind.TransactOpts {
