@@ -1,5 +1,6 @@
 create_table("uploads") {
 	t.Column("id", "uuid", {"primary": true})
-	t.Column("file_path", "string", {})
+	t.Column("ipfs_hash", "string", {})
 	t.Column("key", "string", {})
+	t.Column("address", "string", {})
 }

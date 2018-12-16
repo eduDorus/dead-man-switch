@@ -50,8 +50,9 @@ ALTER TABLE public.schema_migration OWNER TO postgres;
 
 CREATE TABLE public.uploads (
     id uuid NOT NULL,
-    file_path character varying(255) NOT NULL,
+    ipfs_hash character varying(255) NOT NULL,
     key character varying(255) NOT NULL,
+    address character varying(255) NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
