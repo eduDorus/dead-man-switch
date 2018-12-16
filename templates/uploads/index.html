@@ -8,19 +8,15 @@
 <table class="table table-striped">
   <thead>
   <th>IPFSHash</th>
-    <th>Key</th>
     <th>&nbsp;</th>
   </thead>
   <tbody>
     <%= for (upload) in uploads { %>
       <tr>
       <td><%= upload.IPFSHash %></td>
-        <td><%= upload.Key %></td>
         <td>
           <div class="pull-right">
-            <a href="<%= uploadPath({ upload_id: upload.ID }) %>" class="btn btn-info">View</a>
-            <a href="<%= editUploadPath({ upload_id: upload.ID }) %>" class="btn btn-warning">Edit</a>
-            <a href="<%= uploadPath({ upload_id: upload.ID }) %>" data-method="DELETE" data-confirm="Are you sure?" class="btn btn-danger">Destroy</a>
+            <a href="<%= decryptPath({ ipfs_hash: upload.IPFSHash, secret: upload.Key }) %>" target="blank" class="btn btn-info">View</a>
           </div>
         </td>
       </tr>
