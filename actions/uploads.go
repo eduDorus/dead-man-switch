@@ -215,7 +215,6 @@ func (v UploadsResource) Destroy(c buffalo.Context) error {
 
 	// If there are no errors set a flash message
 	c.Flash().Add("success", "Upload was destroyed successfully")
-
 	// Redirect to the uploads index page
 	return c.Render(200, r.Auto(c, upload))
 }
@@ -230,8 +229,9 @@ func UploadFile(u *models.Upload) error {
 	io.Copy(&buf, u.File)
 
 	ed := encrypt(buf.Bytes(), u.Key)
+	
 	// upload and pin to IPFS
-	sh := shell.NewShell("localhost:5001")
+	sh := shell.NewShell("localhost:5001"
 	ipfsHash, err := sh.Add(bytes.NewReader(ed))
 	if err != nil {
 		return errors.WithStack(err)

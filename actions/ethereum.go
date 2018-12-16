@@ -1,6 +1,8 @@
 package actions
 
 import (
+	"crypto/ecdsa"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -31,8 +33,8 @@ type file struct {
 
 func init() {
 
-	auth = createTransactor()
-	userAuth = createTransactor()
+	auth, _ = createTransactor()
+	userAuth, userKey := createTransactor()
 
 	alloc := make(core.GenesisAlloc)
 	alloc[auth.From] = core.GenesisAccount{Balance: big.NewInt(1337000000000000000)}
@@ -49,6 +51,13 @@ func init() {
 	fmt.Println("Mining...")
 	sim.Commit()
 	fmt.Println("Gas used: ", transaction.Gas())
+
+	fmt.Println("PrivateKey:", hex.EncodeToString(userKey.D.Bytes()))
+	fmt.Println("PublicKey:", crypto.PubkeyToAddress(userKey.PublicKey).Hex())
+
+	pk := hex.EncodeToString(userKey.D.Bytes())
+	bpk, _ := hex.DecodeString(pk)
+	prk, _ := crypto.ToECDSA(bpk)
 }
 
 func UploadFileToBlockchain(ipfsHash, address string) error {
@@ -112,10 +121,10 @@ func readFileFromBlockchain(id *big.Int) file {
 	return file
 }
 
-func createTransactor() *bind.TransactOpts {
+func createTransactor() (*bind.TransactOpts, *ecdsa.PrivateKey) {
 	key, err := crypto.GenerateKey()
 	if err != nil {
 		log.Fatal(err)
 	}
-	return bind.NewKeyedTransactor(key)
+	return bind.NewKeyedTransactor(key), key
 }
