@@ -13,8 +13,8 @@ func init() {
 }
 
 func StartPingChecker() {
-	nextTime := time.Now().Truncate(10 * time.Second)
-	nextTime = nextTime.Add(10 * time.Second)
+	nextTime := time.Now().Truncate(20 * time.Second)
+	nextTime = nextTime.Add(20 * time.Second)
 	time.Sleep(time.Until(nextTime))
 	CheckPing()
 	go StartPingChecker()
@@ -24,7 +24,7 @@ func CheckPing() {
 	files := ReadFilesFromBlockchain()
 
 	for index, file := range files {
-		if file.Ping != "" {
+		if file.Key == "" && file.Ping != "" {
 			i, err := strconv.ParseInt(file.Ping, 10, 64)
 			if err != nil {
 				fmt.Println(err)
