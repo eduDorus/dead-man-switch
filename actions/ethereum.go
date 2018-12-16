@@ -55,9 +55,9 @@ func init() {
 	fmt.Println("PrivateKey:", hex.EncodeToString(userKey.D.Bytes()))
 	fmt.Println("PublicKey:", crypto.PubkeyToAddress(userKey.PublicKey).Hex())
 
-	pk := hex.EncodeToString(userKey.D.Bytes())
-	bpk, _ := hex.DecodeString(pk)
-	prk, _ := crypto.ToECDSA(bpk)
+	// pk := hex.EncodeToString(userKey.D.Bytes())
+	// bpk, _ := hex.DecodeString(pk)
+	// prk, _ := crypto.ToECDSA(bpk)
 }
 
 func UploadFileToBlockchain(ipfsHash, address string) error {

@@ -32,9 +32,9 @@ func DecryptHandler(c buffalo.Context) error {
 	}
 
 	var buf bytes.Buffer
-	io.Copy(&buf, u.File)
+	io.Copy(&buf, fileReader)
 
 	content := decrypt(buf.Bytes(), secret)
 	c.Response().Write(content)
-
+	return nil
 }
