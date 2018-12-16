@@ -7,14 +7,14 @@
 
 <table class="table table-striped">
   <thead>
-  <th>FilePath</th>
+  <th>IPFSHash</th>
     <th>Key</th>
     <th>&nbsp;</th>
   </thead>
   <tbody>
     <%= for (upload) in uploads { %>
       <tr>
-      <td><%= upload.FilePath %></td>
+      <td><%= upload.IPFSHash %></td>
         <td><%= upload.Key %></td>
         <td>
           <div class="pull-right">

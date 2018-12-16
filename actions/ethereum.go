@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
@@ -54,15 +55,34 @@ func UploadFileToBlockchain(ipfsHash, address string) error {
 		From:     auth.From,
 		Signer:   auth.Signer,
 		GasLimit: 23816230000000,
-		Value:    big.NewInt(10),
-	}, ipfsHash, auth.From)
+	}, ipfsHash, toAddress)
 	if err != nil {
 		log.Println(err)
 		return errors.WithStack(err)
 	}
 	fmt.Println("Mining...")
 	sim.Commit()
+
+	file, err := contract.Files(&bind.CallOpts{
+		From: auth.From,
+	}, big.NewInt(0))
+	if err != nil {
+		log.Fatal(err)
+	}
+	jsonObject, _ := json.Marshal(file)
+	fmt.Println(string(jsonObject))
 	return nil
+}
+
+func ReadFilesFromBlockchain() {
+	file, err := contract.Files(&bind.CallOpts{
+		From: auth.From,
+	}, big.NewInt(0))
+	if err != nil {
+		log.Fatal(err)
+	}
+	jsonObject, _ := json.Marshal(file)
+	fmt.Println(string(jsonObject))
 }
 
 func createTransactor() *bind.TransactOpts {

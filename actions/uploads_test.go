@@ -24,7 +24,7 @@ func (as *ActionSuite) Test_UploadsResource_Create() {
 	os.RemoveAll("./public/uploads")
 
 	// setup a new Widget
-	u := &models.Upload{FilePath: "/Example/IPFS/path", Key: "OurSecret"}
+	u := &models.Upload{IPFSHash: "/Example/IPFS/path", Key: "OurSecret"}
 
 	// find the file we want to upload
 	r, err := os.Open("./logo.svg")
@@ -40,7 +40,7 @@ func (as *ActionSuite) Test_UploadsResource_Create() {
 	}
 
 	// Post the Upload and the File(s) to /uploads
-	res, err := as.HTML("/uploads").MultiPartPost(u, f)
+	res, err := as.HTML("/uploads").MultiPartPost(u.IPFSHash, f)
 	as.NoError(err)
 	as.Equal(302, res.Code)
 
@@ -50,7 +50,7 @@ func (as *ActionSuite) Test_UploadsResource_Create() {
 
 	// assert the Widget was saved to the DB correctly
 	as.NoError(as.DB.First(u))
-	as.Equal("/Example/IPFS/path", u.FilePath)
+	as.Equal("/Example/IPFS/path", u.IPFSHash)
 	as.Equal("OurSecret", u.Key)
 	as.NotZero(u.ID)
 }
