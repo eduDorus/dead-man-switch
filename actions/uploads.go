@@ -229,9 +229,9 @@ func UploadFile(u *models.Upload) error {
 	io.Copy(&buf, u.File)
 
 	ed := encrypt(buf.Bytes(), u.Key)
-	
+
 	// upload and pin to IPFS
-	sh := shell.NewShell("localhost:5001"
+	sh := shell.NewShell("localhost:5001")
 	ipfsHash, err := sh.Add(bytes.NewReader(ed))
 	if err != nil {
 		return errors.WithStack(err)
