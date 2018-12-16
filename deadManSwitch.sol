@@ -1,5 +1,5 @@
 //Write your own contracts here. Currently compiles using solc v0.4.15+commit.bbb8e64f.
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.1;
 contract DeadSwitch {
     address creatorOfContract;
 
@@ -26,16 +26,16 @@ contract DeadSwitch {
         _;                                             // Otherwise, it continues.
     }
 
-    function addFile(string _ipfsHash, address _creator) public onlyCreator returns (uint fileId) {
+    function addFile(string memory _ipfsHash, address _creator) public onlyCreator returns (uint fileId) {
         fileId = numFiles++; 
         files[fileId] = File(_creator, _ipfsHash, "", "");
     }
 
-    function pubishKey(string _key, uint _fileID) public onlyCreator{
-        files[_fileID].key = key;
+    function pubishKey(string memory _key, uint _fileID) public onlyCreator{
+        files[_fileID].key = _key;
     }
 
-    function ping(string _ping, uint _fileID) public onlyFileOwner(_fileID) {
-        files[_fileID].ping = ping;
+    function ping(string memory _ping, uint _fileID) public onlyFileOwner(_fileID) {
+        files[_fileID].ping = _ping;
     }
 }
