@@ -60,8 +60,7 @@ func App() *buffalo.App {
 
 		app.GET("/", HomeHandler)
 		app.GET("/log", LogHandler)
-		app.GET("/ping", PingHandler)
-		app.PUT("/ping", PingUpdateHandler)
+		app.GET("/ping/{fileId}/{pk}", PingUpdateHandler)
 		app.GET("/decrypt/{ipfs_hash}/{secret}", DecryptHandler)
 
 		// #2 Ping with PK und Fileid

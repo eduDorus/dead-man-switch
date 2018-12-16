@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"strconv"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -32,9 +34,10 @@ type file struct {
 }
 
 func init() {
-
 	auth, _ = createTransactor()
-	userAuth, userKey := createTransactor()
+
+	var userKey *ecdsa.PrivateKey
+	userAuth, userKey = createTransactor()
 
 	alloc := make(core.GenesisAlloc)
 	alloc[auth.From] = core.GenesisAccount{Balance: big.NewInt(1337000000000000000)}
@@ -115,9 +118,6 @@ func readFileFromBlockchain(id *big.Int) file {
 	if err != nil {
 		log.Fatal(err)
 	}
-	jsonObject, _ := json.Marshal(file)
-	fmt.Println(string(jsonObject))
-
 	return file
 }
 
@@ -127,4 +127,19 @@ func createTransactor() (*bind.TransactOpts, *ecdsa.PrivateKey) {
 		log.Fatal(err)
 	}
 	return bind.NewKeyedTransactor(key), key
+}
+
+func PingFile(fileId int, pk *ecdsa.PrivateKey) error {
+
+	pingAuth := bind.NewKeyedTransactor(pk)
+
+	_, err := contract.Ping(&bind.TransactOpts{
+		From:     pingAuth.From,
+		Signer:   pingAuth.Signer,
+		GasLimit: 23816230000000,
+	}, strconv.FormatInt(time.Now().Unix(), 10), big.NewInt(int64(fileId)))
+
+	sim.Commit()
+
+	return err
 }
