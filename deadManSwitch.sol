@@ -1,4 +1,4 @@
-//Write your own contracts here. Currently compiles using solc v0.4.15+commit.bbb8e64f.
+
 pragma solidity ^0.5.1;
 contract DeadSwitch {
     address creatorOfContract;
@@ -9,6 +9,7 @@ contract DeadSwitch {
         string key;
         string ping;
     }
+
     uint numFiles;
     mapping (uint => File) public files;
 
@@ -17,13 +18,17 @@ contract DeadSwitch {
     }
 
     modifier onlyCreator() {
-        require(msg.sender == creatorOfContract); // If caller is not creator, it reverts 
-        _;                              // Otherwise, it continues.
+        require(msg.sender == creatorOfContract, "Access denied. Sender not creator."); 
+        // If caller is not creator, it reverts 
+        _;
+        // Otherwise, it continues.
     }
 
     modifier onlyFileOwner(uint _fileId) {
-        require(files[_fileId].fileOwner == msg.sender); // If caller is not creator of specified file, it reverts
-        _;                                             // Otherwise, it continues.
+        require(files[_fileId].fileOwner == msg.sender, "Access denied. Sender not owner.");
+        // If caller is not fileOwner, it reverts
+        _;
+        // Otherwise, it continues
     }
 
     function addFile(string memory _ipfsHash, address _creator) public onlyCreator returns (uint fileId) {
