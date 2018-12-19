@@ -8,7 +8,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"io"
-	"log"
 
 	"github.com/edudorus/dead-man-switch/models"
 	"github.com/gobuffalo/buffalo"
@@ -105,7 +104,6 @@ func (v UploadsResource) Create(c buffalo.Context) error {
 	}
 
 	if err := UploadFile(upload); err != nil {
-		log.Println("TILL HERE IT WORK")
 		return errors.WithStack(err)
 	}
 

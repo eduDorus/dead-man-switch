@@ -1,5 +1,6 @@
 # Welcome to Dead Man Switch!
 
+The documentation what this project is about can be found [here](https://github.com/edudorus/dead-man-switsch/Abschlussbericht.pdf)
 The following steps describe the process of hosting the dead man switch application.
 
 Prerequisites:
